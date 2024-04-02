@@ -1,0 +1,34 @@
+networks:
+    laravel_pgenum:
+        name: laravel_pgenum
+        driver: bridge
+
+volumes:
+    pgsql:
+        driver: local
+
+services:
+    pgsql:
+        image: 'postgres:16-alpine'
+        ports:
+            - '5432:5432'
+        environment:
+            PGPASSWORD: '${DB_PASSWORD:-laravel_pgenum}'
+            POSTGRES_DB: '${DB_DATABASE:-laravel_pgenum}'
+            POSTGRES_USER: '${DB_USERNAME:-laravel_pgenum}'
+            POSTGRES_PASSWORD: '${DB_PASSWORD:-laravel_pgenum}'
+        volumes:
+            - 'pgsql:/var/lib/postgresql/data'
+        networks:
+            - laravel_pgenum
+        healthcheck:
+            test:
+                - CMD
+                - pg_isready
+                - '-q'
+                - '-d'
+                - '${DB_DATABASE}'
+                - '-U'
+                - '${DB_USERNAME}'
+            retries: 3
+            timeout: 5s
