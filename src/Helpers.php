@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Codelieutenant\LaravelPgenum;
+namespace CodeLieutenant\LaravelPgEnum;
 
-use Codelieutenant\LaravelPgenum\Exceptions\InvalidEnumType;
-use Illuminate\Database\Connection;
+use CodeLieutenant\LaravelPgEnum\Exceptions\InvalidEnumType;
 use Illuminate\Database\Schema\Grammars\Grammar;
 use Illuminate\Support\Str;
+use PDO;
 use ReflectionEnum;
 use ReflectionException;
 use StringBackedEnum;
@@ -28,19 +28,18 @@ final class Helpers
         return $grammar->wrap($name);
     }
 
-    public static function formatValuesForDatabase(Connection $conn, array $values): string
+    public static function formatValuesForDatabase(PDO $pdo, array $values): string
     {
-        $pdo = $conn->getPdo();
         $value = array_reduce(
             $values,
-            static fn($carry, $status) => $carry . ', ' . $pdo->quote(
-                    match (true) {
-                        is_string($status) => $status,
-                        $status instanceof StringBackedEnum => $status->value,
-                        $status instanceof UnitEnum => Str::snake($status->name),
-                        default => throw new InvalidEnumType(),
-                    },
-                ),
+            static fn ($carry, $status) => $carry.', '.$pdo->quote(
+                match (true) {
+                    is_string($status) => $status,
+                    $status instanceof StringBackedEnum => $status->value,
+                    $status instanceof UnitEnum => Str::snake($status->name),
+                    default => throw new InvalidEnumType(),
+                },
+            ),
             ''
         );
 

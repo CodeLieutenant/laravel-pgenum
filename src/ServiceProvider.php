@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Codelieutenant\LaravelPgenum;
+namespace CodeLieutenant\LaravelPgEnum;
 
 use Illuminate\Support\ServiceProvider as LaravelServiceProvider;
 

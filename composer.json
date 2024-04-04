@@ -5,7 +5,7 @@
   "license": "Apache-2.0",
   "autoload": {
     "psr-4": {
-      "Codelieutenant\\LaravelPgenum\\": "src/"
+      "CodeLieutenant\\LaravelPgEnum\\": "src/"
     }
   },
   "authors": [
@@ -29,12 +29,13 @@
     "illuminate/contracts": "^9|^10|^11"
   },
   "require-dev": {
+    "laravel/pint": "^1.15",
     "orchestra/testbench": "^8.22",
     "pestphp/pest": "^2.34"
   },
   "autoload-dev": {
     "psr-4": {
-      "Codelieutenant\\LaravelPgenum\\Tests\\": "tests/",
+      "CodeLieutenant\\LaravelPgEnum\\Tests\\": "tests/",
       "Workbench\\App\\": "workbench/app/",
       "Workbench\\Database\\Factories\\": "workbench/database/factories/",
       "Workbench\\Database\\Seeders\\": "workbench/database/seeders/"
@@ -54,7 +55,7 @@
       "@php vendor/bin/testbench serve"
     ],
     "lint": [
-      "@php vendor/bin/phpstan analyse"
+      "@php vendor/bin/pint"
     ]
   },
   "config": {

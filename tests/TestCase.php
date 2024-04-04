@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Codelieutenant\LaravelPgenum\Tests;
+namespace CodeLieutenant\LaravelPgEnum\Tests;
 
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
 
