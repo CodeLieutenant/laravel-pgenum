@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.3/phpunit.xsd"
+         bootstrap="vendor/autoload.php"
+         colors="true"
+>
+    <source>
+        <include>
+            <directory suffix=".php">src</directory>
+        </include>
+    </source>
+    <testsuites>
+        <testsuite name="Unit">
+            <directory suffix="Test.php">./tests/Unit</directory>
+        </testsuite>
+        <testsuite name="Feature">
+            <directory suffix="Test.php">./tests/Feature</directory>
+        </testsuite>
+        <testsuite name="Architecture">
+            <directory suffix="Test.php">./tests/Architecture</directory>
+        </testsuite>
+    </testsuites>
+    <coverage
+            ignoreDeprecatedCodeUnits="true"
+            disableCodeCoverageIgnore="true">
+        <report>
+            <clover outputFile="./.coverage/coverage.xml"/>
+        </report>
+    </coverage>
+    <logging>
+        <junit outputFile="./.coverage/junit.xml"/>
+        <teamcity outputFile="./.coverage/teamcity.txt"/>
+    </logging>
+    <php>
+        <server name="APP_ENV" value="testing"/>
+        <server name="APP_KEY" value="base64:08FBl6mvlpGeZ68j5AVNNUs/IBg4vsbpK0F0qBm+LHw="/>
+        <server name="DB_CONNECTION" value="pgsql"/>
+        <server name="DB_PORT" value="5432"/>
+        <server name="DB_DATABASE" value="laravel_pgenum"/>
+        <server name="DB_USERNAME" value="laravel_pgenum"/>
+        <server name="DB_PASSWORD" value="laravel_pgenum"/>
+        <server name="CACHE_DRIVER" value="array"/>
+        <server name="QUEUE_CONNECTION" value="sync"/>
+    </php>
+</phpunit>
