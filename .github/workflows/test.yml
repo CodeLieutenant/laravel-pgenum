@@ -71,10 +71,11 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php-versions }}
-          phpts: ${{ matrix.phpts }}
           extensions: ${{ env.extensions }}
           tools: php-cs-fixer, phpcs, composer
           coverage: xdebug
+        env:
+          phpts: ${{ matrix.phpts }}
 
       - name: Composer install
         run: composer install -q --no-ansi --prefer-dist --no-interaction --no-progress
