@@ -1,5 +1,6 @@
 providers:
-  # - Workbench\App\Providers\WorkbenchServiceProvider
+  - Workbench\App\Providers\WorkbenchServiceProvider
+  - CodeLieutenant\LaravelPgEnum\ServiceProvider
 
 migrations:
   - workbench/database/migrations
