@@ -8,7 +8,6 @@ use Closure;
 use CodeLieutenant\LaravelPgEnum\Enums\Direction;
 use CodeLieutenant\LaravelPgEnum\Helpers;
 use Illuminate\Database\Schema\Builder;
-use PDO;
 
 class SchemaExtensions
 {
@@ -18,18 +17,8 @@ class SchemaExtensions
             /** @var $this Builder */
             $conn = $this->getConnection();
             $name = Helpers::formatNameForDatabase($conn->getSchemaGrammar(), $name);
-            $value = Helpers::formatValuesForDatabase(self::getPdo($conn), $values);
+            $value = Helpers::formatPgEnumValuesForDatabase($conn->getPdo(), $values);
             $conn->statement("CREATE TYPE $name AS ENUM ($value);");
-        };
-    }
-
-    private function getPdo(Builder $conn): PDO
-    {
-        $pdo = $conn->getPdo();
-
-        return match (true) {
-            $pdo instanceof Closure => $pdo(),
-            $pdo instanceof PDO => $pdo,
         };
     }
 
@@ -39,7 +28,7 @@ class SchemaExtensions
             /** @var $this Builder */
             $conn = $this->getConnection();
             $name = Helpers::formatNameForDatabase($conn->getSchemaGrammar(), $name);
-            $value = Helpers::formatValuesForDatabase(self::getPdo($conn), $values);
+            $value = Helpers::formatPgEnumValuesForDatabase($conn->getPdo(), $values);
 
             $conn->statement(
                 <<<SQL
@@ -58,7 +47,7 @@ class SchemaExtensions
         return function (string $name): void {
             /** @var $this Builder */
             $conn = $this->getConnection();
-            $name = Helpers::formatNameForDatabase($conn, $name);
+            $name = Helpers::formatNameForDatabase($conn->getSchemaGrammar(), $name);
             $conn->statement("DROP TYPE $name;");
         };
     }
@@ -68,7 +57,7 @@ class SchemaExtensions
         return function (string $name): void {
             /** @var $this Builder */
             $conn = $this->getConnection();
-            $name = Helpers::formatNameForDatabase($conn, $name);
+            $name = Helpers::formatNameForDatabase($conn->getSchemaGrammar(), $name);
             $conn->statement(
                 <<<SQL
                 DO $$
@@ -87,8 +76,9 @@ class SchemaExtensions
         return function (string $type, string $newName): void {
             /** @var $this Builder */
             $conn = $this->getConnection();
-            $type = Helpers::formatNameForDatabase($conn, $type);
-            $newName = Helpers::formatNameForDatabase($conn, $newName);
+            $grammar = $conn->getSchemaGrammar();
+            $type = Helpers::formatNameForDatabase($grammar, $type);
+            $newName = Helpers::formatNameForDatabase($grammar, $newName);
             $conn->statement("ALTER TYPE $type RENAME TO $newName;");
         };
     }
@@ -98,8 +88,9 @@ class SchemaExtensions
         return function (string $type, string $oldName, string $newName): void {
             /** @var $this Builder */
             $conn = $this->getConnection();
-            $oldName = Helpers::formatNameForDatabase($conn, $oldName);
-            $newName = Helpers::formatNameForDatabase($conn, $newName);
+            $grammar = $conn->getSchemaGrammar();
+            $oldName = Helpers::formatNameForDatabase($grammar, $oldName);
+            $newName = Helpers::formatNameForDatabase($grammar, $newName);
             $conn->statement("ALTER TYPE $type RENAME VALUE $oldName TO $newName;");
         };
     }
@@ -115,14 +106,14 @@ class SchemaExtensions
         ) {
             /** @var $this Builder */
             $conn = $this->getConnection();
-            $type = Helpers::formatNameForDatabase($conn, $type);
+            $type = Helpers::formatNameForDatabase($conn->getSchemaGrammar(), $type);
             $stmt = "ALTER TYPE $type ADD VALUE";
 
             if ($ifNotExists) {
                 $stmt .= ' IF NOT EXISTS';
             }
 
-            $stmt .= ' '.Helpers::formatValuesForDatabase($conn, [$value]);
+            $stmt .= ' '.Helpers::formatPgEnumValuesForDatabase($conn->getPdo(), [$value]);
 
             if ($direction && $otherValue) {
                 $stmt .= " $direction->value $otherValue";
