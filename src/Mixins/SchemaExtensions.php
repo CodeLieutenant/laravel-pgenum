@@ -13,27 +13,40 @@ class SchemaExtensions
 {
     public function createEnum(): Closure
     {
-        return function (string $name, array $values): void {
+        return function (string $name, ?array $values = null): void {
             /** @var $this Builder */
             $conn = $this->getConnection();
-            $name = Helpers::formatNameForDatabase($conn->getSchemaGrammar(), $name);
-            $value = Helpers::formatPgEnumValuesForDatabase($conn->getPdo(), $values);
-            $conn->statement("CREATE TYPE $name AS ENUM ($value);");
+
+            $value = match ($values === null) {
+                true => Helpers::extractNameAndValueFromEnum($conn->getPdo(), $name),
+                false => [
+                    'name' => Helpers::formatNameForDatabase($conn->getSchemaGrammar(), $name),
+                    'values' => Helpers::formatPgEnumValuesForDatabase($conn->getPdo(), $values),
+                ],
+            };
+
+            $conn->statement("CREATE TYPE {$value['name']} AS ENUM ({$value['values']});");
         };
     }
 
     public function createEnumIfNotExists(): Closure
     {
-        return function (string $name, array $values): void {
+        return function (string $name, ?array $values = null): void {
             /** @var $this Builder */
             $conn = $this->getConnection();
-            $name = Helpers::formatNameForDatabase($conn->getSchemaGrammar(), $name);
-            $value = Helpers::formatPgEnumValuesForDatabase($conn->getPdo(), $values);
+
+            $value = match ($values === null) {
+                true => Helpers::extractNameAndValueFromEnum($conn->getPdo(), $name),
+                false => [
+                    'name' => Helpers::formatNameForDatabase($conn->getSchemaGrammar(), $name),
+                    'values' => Helpers::formatPgEnumValuesForDatabase($conn->getPdo(), $values),
+                ],
+            };
 
             $conn->statement(
                 <<<SQL
                 DO $$ BEGIN
-                    CREATE TYPE $name AS ENUM($value);
+                    CREATE TYPE {$value['name']} AS ENUM({$value['values']});
                 EXCEPTION
                     WHEN duplicate_object THEN null;
                 END $$;
@@ -102,7 +115,7 @@ class SchemaExtensions
             string $value,
             ?Direction $direction = null,
             ?string $otherValue = null,
-            bool $ifNotExists = false
+            bool $ifNotExists = true
         ) {
             /** @var $this Builder */
             $conn = $this->getConnection();
