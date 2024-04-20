@@ -20,7 +20,7 @@ class SchemaExtensions
             $value = match ($values === null) {
                 true => Helpers::extractNameAndValueFromEnum($conn->getPdo(), $name),
                 false => [
-                    'name' => Helpers::formatNameForDatabase($conn->getSchemaGrammar(), $name),
+                    'name' => $name,
                     'values' => Helpers::formatPgEnumValuesForDatabase($conn->getPdo(), $values),
                 ],
             };
@@ -38,7 +38,7 @@ class SchemaExtensions
             $value = match ($values === null) {
                 true => Helpers::extractNameAndValueFromEnum($conn->getPdo(), $name),
                 false => [
-                    'name' => Helpers::formatNameForDatabase($conn->getSchemaGrammar(), $name),
+                    'name' => $name,
                     'values' => Helpers::formatPgEnumValuesForDatabase($conn->getPdo(), $values),
                 ],
             };
@@ -60,7 +60,6 @@ class SchemaExtensions
         return function (string $name): void {
             /** @var $this Builder */
             $conn = $this->getConnection();
-            $name = Helpers::formatNameForDatabase($conn->getSchemaGrammar(), $name);
             $conn->statement("DROP TYPE $name;");
         };
     }
@@ -70,7 +69,6 @@ class SchemaExtensions
         return function (string $name): void {
             /** @var $this Builder */
             $conn = $this->getConnection();
-            $name = Helpers::formatNameForDatabase($conn->getSchemaGrammar(), $name);
             $conn->statement(
                 <<<SQL
                 DO $$
@@ -84,18 +82,6 @@ class SchemaExtensions
         };
     }
 
-    public function renameEnum(): Closure
-    {
-        return function (string $type, string $newName): void {
-            /** @var $this Builder */
-            $conn = $this->getConnection();
-            $grammar = $conn->getSchemaGrammar();
-            $type = Helpers::formatNameForDatabase($grammar, $type);
-            $newName = Helpers::formatNameForDatabase($grammar, $newName);
-            $conn->statement("ALTER TYPE $type RENAME TO $newName;");
-        };
-    }
-
     public function renameEnumValue(): Closure
     {
         return function (string $type, string $oldName, string $newName): void {
@@ -105,6 +91,7 @@ class SchemaExtensions
             $oldName = Helpers::formatNameForDatabase($grammar, $oldName);
             $newName = Helpers::formatNameForDatabase($grammar, $newName);
             $conn->statement("ALTER TYPE $type RENAME VALUE $oldName TO $newName;");
+            $conn->statement('COMMIT');
         };
     }
 
@@ -119,7 +106,6 @@ class SchemaExtensions
         ) {
             /** @var $this Builder */
             $conn = $this->getConnection();
-            $type = Helpers::formatNameForDatabase($conn->getSchemaGrammar(), $type);
             $stmt = "ALTER TYPE $type ADD VALUE";
 
             if ($ifNotExists) {
@@ -129,10 +115,11 @@ class SchemaExtensions
             $stmt .= ' '.Helpers::formatPgEnumValuesForDatabase($conn->getPdo(), [$value]);
 
             if ($direction && $otherValue) {
-                $stmt .= " $direction->value $otherValue";
+                $stmt .= " $direction->value '$otherValue'";
             }
 
             $conn->statement($stmt);
+            $conn->statement('COMMIT');
         };
     }
 }

@@ -27,7 +27,7 @@ final class Helpers
             $name = Str::snake($reflection->getShortName());
         }
 
-        return $grammar->wrap($name);
+        return '\''.$name.'\'';
     }
 
     public static function extractNameAndValueFromEnum(PDO $pdo, string $name): array

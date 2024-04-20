@@ -27,7 +27,7 @@ enum NonBackedEnum
 
 it('formats name for database usage', function () {
     $name = Helpers::formatNameForDatabase(new PostgresGrammar(), 'name');
-    expect($name)->toBe('"name"');
+    expect($name)->toBe('\'name\'');
 });
 
 it('formats enum values', function (array $cases, string $expected) {
