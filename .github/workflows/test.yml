@@ -4,16 +4,9 @@ on:
   push:
     branches:
       - master
-    paths:
-      - 'src/**'
-      - 'tests/**'
-
   pull_request:
     branches:
       - master
-    paths:
-      - 'src/**'
-      - 'tests/**'
   schedule:
     - cron: '0 0 * * *'
 
