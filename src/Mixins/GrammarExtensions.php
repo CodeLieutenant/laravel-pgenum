@@ -20,4 +20,14 @@ class GrammarExtensions
             };
         };
     }
+
+    public function typeEnumerations(): Closure
+    {
+        return function (ColumnDefinition $columnDefinition) {
+            return match (class_exists($name = $columnDefinition['pg_enum'])) {
+                true => Str::snake((new ReflectionEnum($name))->getShortName()) . '[]',
+                false => $name
+            };
+        };
+    }
 }

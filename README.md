@@ -65,7 +65,10 @@ There is only one function for Blueprint `enumeration` to create a column in tab
 
 ```php
 // Accepts PHP Enums and Strings
-\Illuminate\Database\Schema\Blueprint::enumeration(string $name);
+\Illuminate\Database\Schema\Blueprint::enumeration(string $name, string $type, ?array $options = null);
+
+// For Enum List e.g: SomeEnum[]
+\Illuminate\Database\Schema\Blueprint::enumerations(string $name, string $type, ?array $options = null);
 ```
 
 ### Full Migration Example
@@ -79,7 +82,8 @@ public function up(): void
     Schema::createEnum(MyEnum::class);
     Schema::create('users', function(Blueprint $table) {
         $table->id();
-        $table->enumeration(MyEnum::class);   
+        $table->enumeration('my_enum_field', MyEnum::class); // Single Enum field 
+        $table->enumerations('my_list', MyEnum::class);   // Array of Enums field
     });
 }
 
