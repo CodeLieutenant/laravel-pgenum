@@ -19,4 +19,15 @@ class BlueprintExtensions
             ]);
         };
     }
+
+    public function enumerations(): Closure
+    {
+        return function (string $name, string $type, array $options = []) {
+            /** @var $this Blueprint */
+            return $this->addColumn('enumerations', $name, [
+                'pg_enum' => $type,
+                ...$options,
+            ]);
+        };
+    }
 }
